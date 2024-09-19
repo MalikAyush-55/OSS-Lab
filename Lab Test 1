@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import convolve
+
+
+time_hr = np.arange(126)
+print(time_hr)
+trading_volume = np.random.rand(126,1)
+random_noise = np.random.rand(126,1)
+print(time_hr.shape)
+print(trading_volume.shape)
+trading_volume1 = random_noise + trading_volume
+
+trading_volume_bool = np.random.rand(126)
+smoothed_data = np.convolve(trading_volume_bool, np.ones(7)/7,"same")
+print(smoothed_data)
+
+avg_hr_week = np.array([np.mean(smoothed_data[i*7:(i+7)]) for i in range(18)])
+
+plt.plot(time_hr, trading_volume, label='without fluctuation')
+plt.plot(time_hr, smoothed_data, label='after fluctuations')
+
+
+threshold_hr = 1.5*np.mean(trading_volume)
+exceed_threshold_hr = smoothed_data > threshold_hr
+over_time = 3  
+
+
+extra = np.convolve(exceed_threshold_hr, np.ones(over_time), 'same') >= over_time
+plt.fill_between(time_hr, 0, smoothed_data, where=extra, color='red', alpha=0.3, label='over trade')
+plt.title('Heart Rate Data: Noisy, Smoothed, and Weekly Averages')
+plt.xlabel('Time (seconds)')
+plt.ylabel('Trade stocks')
+plt.legend()
+plt.show()
